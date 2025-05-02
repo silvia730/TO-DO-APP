@@ -33,10 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const editBtn = todoElement.querySelector('.fa-pen-to-square');
 
         deleteBtn.addEventListener('click', () => {
+            const isConfirmed = confirm('Are you sure you want to delete this todo?');
+            if (isConfirmed) {
             todos.splice(index, 1);
             saveTodos();
             renderTodos();
-        });
+        } 
+    });
 
         completeBtn.addEventListener('click', () => {
             todos[index].completed = !todos[index].completed;
