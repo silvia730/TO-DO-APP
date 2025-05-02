@@ -1,0 +1,200 @@
+:root {
+    --dark: #374151;
+    --darker: #1f2937;
+    --darkest: #111827;
+    --gray: #6b7280;
+    --light: #f3f4f6;
+    --pink: #f472b6;
+    --purple: #a855f7;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 1440px;
+    margin: 0 auto;
+    background-color: var(--dark);
+    color: white;
+}
+
+.container {
+    max-width: 100%;
+}
+
+h3 {
+    color: var(--pink);
+    font-size: 50px;
+    text-decoration: none;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.todo-form {
+    background: var(--light);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    max-width: 100%;
+
+}
+
+.todo-form .form-control {
+    background: var(--light);
+    border: 1px solid var(--gray);
+    color: var(--gray);
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.todo-form .form-control:focus {
+    background: var(--gray);
+    color: rgb(255, 255, 255);
+    border-color: var(--pink);
+    box-shadow: 0 0 0 0.2rem rgba(244, 114, 182, 0.25);
+}
+ /* Add to your todo.css file */
+
+#addTodoBtn {
+    background-color: var(--pink);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    margin-top: 5px;
+    width: auto;
+    min-width: 120px;
+}
+
+#addTodoBtn:hover {
+    background-color: #ff4d9e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(244, 114, 182, 0.3);
+}
+
+#addTodoBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(244, 114, 182, 0.3);
+}
+
+#addTodoBtn:focus {
+    box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.3);
+}
+
+/* For mobile responsiveness */
+@media (max-width: 768px) {
+    #addTodoBtn {
+        width: 100%;
+        margin-top: 10px;
+        padding: 12px 20px;
+    }
+}
+
+.todo-item {
+    background: var(--darker);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.todo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.todo-item.completed {
+    opacity: 0.7;
+}
+
+.todo-item.completed h4 {
+    text-decoration: line-through;
+    color: var(--gray);
+}
+
+.todo-content {
+    flex-grow: 1;
+    margin-right: 20px;
+}
+
+.todo-content h4 {
+    color: var(--light);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.todo-content small {
+    color: var(--gray);
+    font-size: 0.9em;
+}
+
+.todo-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.todo-actions i {
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.fa-check:hover {
+    color: #28a745 !important;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.fa-bookmark:hover {
+    color: #ffc107 !important;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.fa-pen-to-square:hover {
+    color: #17a2b8 !important;
+    background: rgba(23, 162, 184, 0.1);
+}
+
+.fa-trash:hover {
+    color: #dc3545 !important;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.fa-bookmark.text-warning {
+    color: #ffc107 !important;
+}
+
+@media (max-width: 768px) {
+    .todo-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .todo-actions {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

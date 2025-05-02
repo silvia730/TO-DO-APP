@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Todo App</title>
+    <link rel="stylesheet" href="todo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/9.0.0/mdb.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container p-4">
+        <h3>Todo List</h3>
+        <div class="todo-form">
+            <div class="row g-2 align-items-center mb-3">
+                <div class="col-md-4">
+                    <input id="todoInput" placeholder="Enter Todo" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <input id="dueDate" type="date" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <input id="dueTime" type="time" class="form-control">
+                </div>
+                <div class="col-md-2 text-center">
+                    <button id="addTodoBtn" class="btn btn-primary w-100">ADD TODO</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div id="todoList" class="rounded p-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="todo.js"></script>
+</body>
+</html>
