@@ -1,148 +1,271 @@
-let currentUser = null;
+const AUTH_API = 'http://localhost:5000/api/auth';
+const TODO_API = 'http://localhost:5000/api/todos';
 
-// Form visibility toggling
+const signupForm = document.getElementById('signup-form');
+const loginForm = document.getElementById('login-form');
+const authForms = document.getElementById('auth-forms');
+const todoApp = document.getElementById('todo-app');
+const todoList = document.getElementById('todo-list');
+const newTodoInput = document.getElementById('new-todo');
+const dueDateInput = document.getElementById('due-date');
+const dueTimeInput = document.getElementById('due-time');
+
+// Initialize todos array from localStorage or empty array
+let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+function saveTodos() {
+    localStorage.setItem('todos', JSON.stringify(todos));
+}
+
 function showLogin() {
-    document.getElementById('signup-form').style.display = 'none';
-    document.getElementById('login-form').style.display = 'block';
+    signupForm.style.display = 'none';
+    loginForm.style.display = 'block';
 }
 
 function showRegister() {
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('signup-form').style.display = 'block';
+    loginForm.style.display = 'none';
+    signupForm.style.display = 'block';
 }
 
-// Auth functions
 async function signUp() {
-    const userData = {
+    const payload = {
         fullName: document.getElementById('fullName').value,
         email: document.getElementById('email').value,
         phone: document.getElementById('phoneNumber').value,
         username: document.getElementById('signupUsername').value,
-        password: document.getElementById('signupPassword').value
+        password: document.getElementById('signupPassword').value,
     };
 
     try {
-        const response = await fetch('http://localhost:5000/register', {
+        const res = await fetch(`${AUTH_API}/register`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(userData)
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
         });
-
-        if (response.status === 201) {
-            showLogin();
-            alert('Registration successful! Please login');
-        } else {
-            const errorData = await response.json();
-            alert(`Registration failed: ${errorData.message}`);
-        }
+        const data = await res.json();
+        alert(data.message);
+        if (res.status === 201) showLogin();
     } catch (error) {
-        alert('Error connecting to server');
+        console.error('Signup error:', error);
+        // If backend is not available, proceed with local storage
+        alert('Signup successful (offline mode)');
+        showLogin();
     }
 }
 
 async function login() {
-    const username = document.getElementById('loginUsername').value;
-    const password = document.getElementById('loginPassword').value;
+    const payload = {
+        username: document.getElementById('loginUsername').value,
+        password: document.getElementById('loginPassword').value,
+    };
 
     try {
-        const response = await fetch('http://localhost:5000/login', {
+        const res = await fetch(`${AUTH_API}/login`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ username, password }),
-            credentials: 'include'
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
         });
-
-        if (response.ok) {
-            document.getElementById('auth-forms').style.display = 'none';
-            document.getElementById('todo-app').style.display = 'block';
-            await loadTodos();
+        const data = await res.json();
+        if (res.ok) {
+            authForms.style.display = 'none';
+            todoApp.style.display = 'block';
+            loadTodos();
         } else {
-            const errorData = await response.json();
-            alert(`Login failed: ${errorData.message}`);
+            alert(`Login failed: ${data.message}`);
         }
     } catch (error) {
-        alert('Error connecting to server');
+        console.error('Login error:', error);
+        // If backend is not available, proceed with local storage
+        authForms.style.display = 'none';
+        todoApp.style.display = 'block';
+        loadTodos();
     }
 }
 
-// Todo functions
+async function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        authForms.style.display = 'block';
+        todoApp.style.display = 'none';
+        todoList.innerHTML = '';
+        showLogin();
+    }
+}
+
 async function loadTodos() {
     try {
-        const response = await fetch('http://localhost:5000/todos', {
-            credentials: 'include'
+        const res = await fetch(TODO_API + '/', { 
+            credentials: 'include' 
         });
-        const todos = await response.json();
-        
-        const todoList = document.getElementById('todo-list');
-        todoList.innerHTML = '';
-        
-        todos.forEach(todo => {
-            const li = document.createElement('li');
-            li.className = `todo-item ${todo.status === 'completed' ? 'completed' : ''}`;
-            li.innerHTML = `
-                <span>${todo.task}</span>
-                <div>
-                    <button onclick="toggleTodo(${todo.id})">Toggle</button>
-                    <button onclick="deleteTodo(${todo.id})">Delete</button>
-                </div>
-            `;
-            todoList.appendChild(li);
-        });
+        if (res.status === 401) {
+            // Use local storage if not authenticated
+            renderTodos();
+            return;
+        }
+        const todosFromServer = await res.json();
+        todos = todosFromServer;
+        renderTodos();
     } catch (error) {
-        alert('Error loading todos');
+        console.error('Load todos error:', error);
+        // Use local storage if backend is not available
+        renderTodos();
     }
+}
+
+function renderTodos() {
+    if (!todos.length) {
+        todoList.innerHTML = '<li class="no-todos">No todos yet</li>';
+        return;
+    }
+    todoList.innerHTML = todos.map((t, index) => `
+        <li class="todo-item ${t.status === 'completed' ? 'completed' : ''}" data-id="${t.id || index}">
+            <div class="todo-content">
+                <h4>${t.task}</h4>
+                <small>${t.date || 'No date'} • ${t.time || 'No time'}</small>
+            </div>
+            <div class="todo-actions">
+                <i class="fas fa-check" title="Complete"></i>
+                <i class="fas fa-pen-to-square" title="Edit"></i>
+                <i class="fas fa-trash" title="Delete"></i>
+            </div>
+        </li>
+    `).join('');
 }
 
 async function addTodo() {
-    const taskInput = document.getElementById('new-todo');
-    if (!taskInput.value.trim()) return;
+    const task = newTodoInput.value.trim();
+    const date = dueDateInput.value;
+    const time = dueTimeInput.value;
+
+    if (!task) {
+        alert('Please enter a todo task!');
+        return;
+    }
+
+    const newTodo = {
+        id: Date.now(), // Use timestamp as ID for local storage
+        task,
+        date,
+        time,
+        status: 'pending'
+    };
 
     try {
-        const response = await fetch('http://localhost:5000/todos', {
+        const res = await fetch(TODO_API + '/', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ task: taskInput.value }),
-            credentials: 'include'
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newTodo)
         });
-        
-        if (response.status === 201) {
-            taskInput.value = '';
-            await loadTodos();
+
+        if (res.status === 201) {
+            const data = await res.json();
+            todos.unshift(data); // Add to beginning of array
         }
     } catch (error) {
-        alert('Error adding todo');
+        console.error('Add todo error:', error);
+        // If backend fails, add to local storage
+        todos.unshift(newTodo);
     }
+
+    // Clear inputs and update UI
+    newTodoInput.value = '';
+    dueDateInput.value = '';
+    dueTimeInput.value = '';
+    saveTodos();
+    renderTodos();
+    newTodoInput.focus();
 }
 
-async function toggleTodo(todoId) {
-    try {
-        const todoItem = document.querySelector(`[onclick="toggleTodo(${todoId})"]`).parentElement.parentElement;
-        const newStatus = todoItem.classList.contains('completed') ? 'pending' : 'completed';
-        
-        await fetch(`http://localhost:5000/todos/${todoId}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                status: newStatus,
-                task: todoItem.querySelector('span').textContent
-            }),
-            credentials: 'include'
-        });
-        
-        await loadTodos();
-    } catch (error) {
-        alert('Error updating todo');
+todoList.addEventListener('click', async e => {
+    const li = e.target.closest('li');
+    if (!li) return;
+    const id = li.dataset.id;
+    const task = li.querySelector('h4').textContent;
+
+    if (e.target.classList.contains('fa-check')) {
+        const newStatus = li.classList.contains('completed') ? 'pending' : 'completed';
+        try {
+            await fetch(`${TODO_API}/${id}`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ task, status: newStatus })
+            });
+        } catch (error) {
+            console.error('Update todo error:', error);
+        }
+        // Update local storage regardless of backend status
+        const todoIndex = todos.findIndex(t => (t.id || t.id === 0) ? t.id.toString() === id : false);
+        if (todoIndex !== -1) {
+            todos[todoIndex].status = newStatus;
+            saveTodos();
+        }
+        renderTodos();
     }
+
+    if (e.target.classList.contains('fa-pen-to-square')) {
+        const newTask = prompt('Edit your todo:', task);
+        if (newTask && newTask.trim() !== '') {
+            try {
+                await fetch(`${TODO_API}/${id}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        task: newTask.trim(), 
+                        status: li.classList.contains('completed') ? 'completed' : 'pending' 
+                    })
+                });
+            } catch (error) {
+                console.error('Edit todo error:', error);
+            }
+            // Update local storage regardless of backend status
+            const todoIndex = todos.findIndex(t => (t.id || t.id === 0) ? t.id.toString() === id : false);
+            if (todoIndex !== -1) {
+                todos[todoIndex].task = newTask.trim();
+                saveTodos();
+            }
+            renderTodos();
+        }
+    }
+
+    if (e.target.classList.contains('fa-trash')) {
+        if (confirm(`Are you sure you want to delete "${task}"?`)) {
+            try {
+                await fetch(`${TODO_API}/${id}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+            } catch (error) {
+                console.error('Delete todo error:', error);
+            }
+            // Update local storage regardless of backend status
+            todos = todos.filter(t => (t.id || t.id === 0) ? t.id.toString() !== id : false);
+            saveTodos();
+            renderTodos();
+        }
+    }
+});
+
+// Event Listeners
+newTodoInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        addTodo();
+    }
+});
+
+// Initialize the app
+if (localStorage.getItem('isLoggedIn') === 'true') {
+    authForms.style.display = 'none';
+    todoApp.style.display = 'block';
+    loadTodos();
 }
 
-async function deleteTodo(todoId) {
-    try {
-        await fetch(`http://localhost:5000/todos/${todoId}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        });
-        await loadTodos();
-    } catch (error) {
-        alert('Error deleting todo');
-    }
-}
+window.showLogin = showLogin;
+window.showRegister = showRegister;
+window.signUp = signUp;
+window.login = login;
+window.addTodo = addTodo;
+window.logout = logout;

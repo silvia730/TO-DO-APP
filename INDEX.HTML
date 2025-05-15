@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My To do App</title>
+    <title>My To Do App</title>
     <link rel="stylesheet" href="style.css">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
@@ -16,47 +16,69 @@
 
 <body>
     <div id="auth-forms">
+        <!-- Sign Up Form -->
         <div class="form-container" id="signup-form">
             <h2>Sign Up</h2>
             <label for="fullName">Full Name:</label>
-            <input type="text" id="fullName" placeholder="Full Name" required><br><br>
+            <input type="text" id="fullName" placeholder="Full Name" required>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="mailto@gmail.com" required><br><br>
+            <input type="email" id="email" placeholder="mailto@gmail.com" required>
 
             <label for="phoneNumber">Phone Number:</label>
-            <input type="tel" id="phoneNumber" placeholder="Phone Number" required><br><br>
+            <input type="tel" id="phoneNumber" placeholder="Phone Number" required>
 
             <label for="signupUsername">Username:</label>
-            <input type="text" id="signupUsername" placeholder="Username" required><br><br>
+            <input type="text" id="signupUsername" placeholder="Username" required>
 
             <label for="signupPassword">Password:</label>
-            <input type="password" id="signupPassword" placeholder="Password" required><br><br>
+            <input type="password" id="signupPassword" placeholder="Password" required>
 
-            <button onclick="signUp()">Sign Up</button><br><br>
+            <button onclick="signUp()">Sign Up</button>
             <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
         </div>
 
+        <!-- Login Form -->
         <div class="form-container" id="login-form" style="display: none;">
             <h2>Sign In</h2>
             <h3>Welcome Back</h3>
 
             <label for="loginUsername">Username:</label>
-            <input type="text" id="loginUsername" placeholder="Username" required><br><br>
+            <input type="text" id="loginUsername" placeholder="Username" required>
 
             <label for="loginPassword">Password:</label>
-            <input type="password" id="loginPassword" placeholder="Password" required><br><br>
+            <input type="password" id="loginPassword" placeholder="Password" required>
 
-            <button onclick="login()">Login</button><br><br>
-            <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+            <button onclick="login()">Login</button>
+            <p>Don't have an account? <a href="#" onclick="showSignUp()">Register</a></p>
+        </div>
+    </div>
+
+    <div id="todo-app" style="display: none;">
+        <div class="todo-header">
+            <h3>Todo List</h3>
+            <button onclick="logout()" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+        
+        <div class="todo-form">
+            <div class="form-row">
+                <input type="text" id="new-todo" placeholder="Enter Todo" class="form-control" required>
+                <input type="date" id="due-date" class="form-control">
+                <input type="time" id="due-time" class="form-control">
+            </div>
+            <button onclick="addTodo()" id="addTodoBtn">
+                <i class="fas fa-plus"></i> Add Todo
+            </button>
         </div>
 
-       
+        <div class="todo-list-container">
+            <ul id="todo-list"></ul>
+        </div>
+    </div>
 
-
-
-
-            <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 
 </html>

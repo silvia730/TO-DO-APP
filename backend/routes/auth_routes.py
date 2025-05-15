@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, session
-from app import mysql, bcrypt
+from init import mysql, bcrypt
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -34,4 +34,3 @@ def login():
         return jsonify(message='Login successful'), 200
     else:
         return jsonify(message='Invalid credentials'), 401
-

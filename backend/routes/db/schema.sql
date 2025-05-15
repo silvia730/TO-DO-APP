@@ -12,11 +12,17 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
 CREATE TABLE todos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    task TEXT NOT NULL,
-    status ENUM('pending', 'completed') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    text VARCHAR(255) NOT NULL CHECK (text <> ''),
+    date DATE,
+    time TIME,
+    completed BOOLEAN NOT NULL DEFAULT false,
+    bookmarked BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_todos_created ON todos(created_at);
+CREATE INDEX idx_todos_status ON todos(completed, bookmarked);
